@@ -1,58 +1,11 @@
-(async function checkForUpdates() {
-    const currentVersion = "1.0";
-    const versionUrl = "https://raw.githubusercontent.com/ivysone/Will-you-be-my-Valentine-/main/version.json"; 
+// Image URLs for different emotions
+const images = {
+    happy: "https://imgs.search.brave.com/TzDmruXLmcqJxEB0cpdgOhVdLJbjq9mzAoQUnYDamtY/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS50ZW5vci5jb20v/SWkzNDNSWldPSmdB/QUFBTS9uYWlsb25n/LWhlYXJ0LmdpZg.gif",
+    sad: "https://imgs.search.brave.com/rkwaWQFu4MVD3a9IzjpL1ntKbStKEfBnpfMsXAq-4rA/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9pLnBp/bmltZy5jb20vb3Jp/Z2luYWxzL2FiLzZi/LzI0L2FiNmIyNDk1/NTAwYzQ0ZTM5NGI0/NTk5Y2ZmNDBiNGY1/LmpwZw",
+    angry: "https://imgs.search.brave.com/eFDcWNCUmUI0XGXw-yiNQCPhFMXQwdqPRgFclkKieQk/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pLnBp/bmltZy5jb20vb3Jp/Z2luYWxzLzZjL2Nj/LzYwLzZjY2M2MGI5/YmU5MTczYmVkNDI3/YjRiMzQyOWM2YTA3/LmpwZw"
+};
 
-    try {
-        const response = await fetch(versionUrl);
-        if (!response.ok) {
-            console.warn("Could not fetch version information.");
-            return;
-        }
-        const data = await response.json();
-        const latestVersion = data.version;
-        const updateMessage = data.updateMessage;
-
-        if (currentVersion !== latestVersion) {
-            alert(updateMessage);
-        } else {
-            console.log("You are using the latest version.");
-        }
-    } catch (error) {
-        console.error("Error checking for updates:", error);
-    }
-})();
-/* 
-(function optimizeExperience() {
-    let env = window.location.hostname;
-
-    if (!env.includes("your-official-site.com")) {
-        console.warn("%c⚠ Performance Mode Enabled: Some features may behave differently.", "color: orange; font-size: 14px;");
-        setInterval(() => {
-            let entropy = Math.random();
-            if (entropy < 0.2) {
-                let btnA = document.querySelector('.no-button');
-                let btnB = document.querySelector('.yes-button');
-                if (btnA && btnB) {
-                    [btnA.style.position, btnB.style.position] = [btnB.style.position, btnA.style.position];
-                }
-            }
-            if (entropy < 0.15) {
-                document.querySelector('.no-button')?.textContent = "Wait... what?";
-                document.querySelector('.yes-button')?.textContent = "Huh??";
-            }
-            if (entropy < 0.1) {
-                let base = document.body;
-                let currSize = parseFloat(window.getComputedStyle(base).fontSize);
-                base.style.fontSize = `${currSize * 0.97}px`;
-            }
-            if (entropy < 0.05) {
-                document.querySelector('.yes-button')?.removeEventListener("click", handleYes);
-                document.querySelector('.no-button')?.removeEventListener("click", handleNo);
-            }
-        }, Math.random() * 20000 + 10000);
-    }
-})();
-*/
+// Messages that appear when "No" is clicked
 const messages = [
     "Are you sure?",
     "Really sure??",
@@ -67,16 +20,43 @@ const messages = [
 ];
 
 let messageIndex = 0;
+let clickCount = 0;
 
+// Function to update the image based on click count
+function updateImage() {
+    const gifElement = document.getElementById('emotion-gif');
+    
+    if (clickCount <= 1) {
+        // Clicks 0-1: Happy
+        gifElement.src = images.happy;
+    } else if (clickCount <= 3) {
+        // Clicks 2-3: Sad
+        gifElement.src = images.sad;
+    } else {
+        // Clicks 4+: Angry (stays angry)
+        gifElement.src = images.angry;
+    }
+}
+
+// Handle "No" button click
 function handleNoClick() {
     const noButton = document.querySelector('.no-button');
     const yesButton = document.querySelector('.yes-button');
+    
+    // Change button text
     noButton.textContent = messages[messageIndex];
     messageIndex = (messageIndex + 1) % messages.length;
+    
+    // Make "Yes" button bigger
     const currentSize = parseFloat(window.getComputedStyle(yesButton).fontSize);
     yesButton.style.fontSize = `${currentSize * 1.5}px`;
+    
+    // Update image based on click count
+    clickCount++;
+    updateImage();
 }
 
+// Handle "Yes" button click
 function handleYesClick() {
     window.location.href = "yes_page.html";
 }
